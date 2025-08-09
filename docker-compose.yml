@@ -1,0 +1,25 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    ports:
+      - "2181:2181"
+    networks:
+      - producer-consumer
+    env_file:
+      - .env_dev
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    networks:
+      - producer-consumer
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    env_file:
+      - .env_dev
+
+networks:
+  producer-consumer:
+    external: true

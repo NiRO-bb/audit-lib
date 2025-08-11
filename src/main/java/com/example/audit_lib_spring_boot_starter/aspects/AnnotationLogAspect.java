@@ -3,23 +3,27 @@ package com.example.audit_lib_spring_boot_starter.aspects;
 import com.example.audit_lib_spring_boot_starter.kafka.KafkaLogger;
 import com.example.audit_lib_spring_boot_starter.utils.LoggingUtil;
 import com.example.audit_lib_spring_boot_starter.utils.LogLevels;
-import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Represents the aspect for method logging.
  * Uses the @AuditLog annotation as pointcut and applies Around advice.
  */
 @Aspect
-@RequiredArgsConstructor
+@Component
 public class AnnotationLogAspect {
 
-     private final Logger logger;
-     private final KafkaLogger kafkaLogger;
+     private final Logger logger = LogManager.getLogger("AnnotationLogger");
+
+     @Autowired
+     private KafkaLogger kafkaLogger;
 
     /**
      * Around advice.

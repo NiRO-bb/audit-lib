@@ -1,33 +1,42 @@
 package com.example.audit_lib_spring_boot_starter.kafka;
 
-import com.example.audit_lib_spring_boot_starter.utils.LogLevels;
+import com.example.audit_lib_spring_boot_starter.configs.AuditLibProperties;
 import com.example.audit_lib_spring_boot_starter.kafka.dto.KafkaAnnotationLog;
 import com.example.audit_lib_spring_boot_starter.kafka.dto.KafkaHttpLog;
-import lombok.RequiredArgsConstructor;
+import com.example.audit_lib_spring_boot_starter.utils.LogLevels;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.stereotype.Component;
 
 import static com.example.audit_lib_spring_boot_starter.utils.LogLevels.OFF;
 
 /**
  * Manages log writing to Kafka topic.
  */
-@RequiredArgsConstructor
+@Component
 public class KafkaLogger {
-
-    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     private final LogLevels annotationLogLevel;
 
     private final LogLevels httpLogLevel;
 
-    private final String topicName;
+    private final String topic;
+
+    @Autowired
+    private KafkaTemplate<String, Object> kafkaTemplate;
+
+    public KafkaLogger(@Autowired AuditLibProperties properties) {
+        annotationLogLevel = properties.getAnnotationKafkaLevel();
+        httpLogLevel = properties.getHttpKafkaLevel();
+        topic = properties.getKafkaTopicName();
+    }
 
     /**
      * Sends message to Kafka topic from annotated methods.
      */
     public void log(String stage, String id, String methodName, Object body) {
         if (!annotationLogLevel.equals(OFF)) {
-            kafkaTemplate.send(topicName,
+            kafkaTemplate.send(topic,
                     new KafkaAnnotationLog(annotationLogLevel, stage, id, methodName, body.toString()));
         }
     }
@@ -37,7 +46,7 @@ public class KafkaLogger {
      */
     public void log(String type, String method, int statusCode, String url, String request, String response) {
         if (!httpLogLevel.equals(OFF)) {
-            kafkaTemplate.send(topicName,
+            kafkaTemplate.send(topic,
                     new KafkaHttpLog(type, method, statusCode, url, request, response));
         }
     }

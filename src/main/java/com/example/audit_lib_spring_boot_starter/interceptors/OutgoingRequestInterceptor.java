@@ -1,30 +1,37 @@
 package com.example.audit_lib_spring_boot_starter.interceptors;
 
+import com.example.audit_lib_spring_boot_starter.configs.AuditLibProperties;
 import com.example.audit_lib_spring_boot_starter.interceptors.wrappers.OutgoingResponseWrapper;
 import com.example.audit_lib_spring_boot_starter.kafka.KafkaLogger;
 import com.example.audit_lib_spring_boot_starter.utils.LogLevels;
 import com.example.audit_lib_spring_boot_starter.utils.LoggingUtil;
-import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Intercepts outgoing http-requests and logs them.
  */
-@RequiredArgsConstructor
+@Component
 public class OutgoingRequestInterceptor implements ClientHttpRequestInterceptor {
 
-    private final Logger logger;
+    private final Logger logger = LogManager.getLogger("HttpLogger");
 
-    private final KafkaLogger kafkaLogger;
+    private final LogLevels httpLoggingLevel;
 
-    private final LogLevels logLevel;
+    @Autowired
+    private KafkaLogger kafkaLogger;
+
+    public OutgoingRequestInterceptor(@Autowired AuditLibProperties properties) {
+        httpLoggingLevel = properties.getHttpLoggingLevel();
+    }
 
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
@@ -38,7 +45,7 @@ public class OutgoingRequestInterceptor implements ClientHttpRequestInterceptor 
         String requestBody = LoggingUtil.getBody(body);
         String responseBody = LoggingUtil.getBody(responseWrapper.getBody().readAllBytes());
 
-        logger.log(LoggingUtil.getLevel(logLevel), "Outgoing {} {} {} RequestBody = {} ResponseBody = {}",
+        logger.log(LoggingUtil.getLevel(httpLoggingLevel), "Outgoing {} {} {} RequestBody = {} ResponseBody = {}",
                 method, statusCode, url, requestBody, responseBody);
         kafkaLogger.log("Outgoing", method, statusCode, url, requestBody, responseBody);
         return responseWrapper;

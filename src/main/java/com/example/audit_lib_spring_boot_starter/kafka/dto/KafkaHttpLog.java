@@ -2,6 +2,7 @@ package com.example.audit_lib_spring_boot_starter.kafka.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ import java.time.format.DateTimeFormatter;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 public class KafkaHttpLog {
 
     @JsonIgnore

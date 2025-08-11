@@ -7,6 +7,8 @@ import org.aspectj.lang.reflect.MethodSignature;
 
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -81,7 +83,7 @@ public final class LoggingUtil {
         if (body.length == 0) {
             return "{}";
         }
-        return new String(body, StandardCharsets.UTF_8);
+        return new String(body, StandardCharsets.UTF_8).replaceAll("[\\r\\n]", "");
     }
 
     /**
@@ -99,6 +101,26 @@ public final class LoggingUtil {
             builder.delete(builder.lastIndexOf(","), builder.length() - 1);
         }
         builder.append("]");
+        return builder.toString();
+    }
+
+    /**
+     * Creates URL as String type from passed parameters.
+     *
+     * @param path path without params
+     * @param params name-value pairs
+     * @return created URL
+     */
+    public static String getURL(String path, Map<String, String[]> params) {
+        StringBuilder builder = new StringBuilder(path);
+        if (!params.isEmpty()) {
+            builder.append("?");
+            for (String key : params.keySet()) {
+                builder.append(String.format("%s=%s", key, Arrays.toString(params.get(key))));
+                builder.append("&");
+            }
+            builder.deleteCharAt(builder.lastIndexOf("&"));
+        }
         return builder.toString();
     }
 

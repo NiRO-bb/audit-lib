@@ -34,10 +34,10 @@ public class KafkaLogger {
     /**
      * Sends message to Kafka topic from annotated methods.
      */
-    public void log(String stage, String id, String methodName, Object body) {
+    public void log(String stage, String id, String methodName, String body) {
         if (!annotationLogLevel.equals(OFF)) {
             kafkaTemplate.send(topic,
-                    new KafkaAnnotationLog(annotationLogLevel, stage, id, methodName, body.toString()));
+                    new KafkaAnnotationLog(annotationLogLevel, stage, id, methodName, body));
         }
     }
 

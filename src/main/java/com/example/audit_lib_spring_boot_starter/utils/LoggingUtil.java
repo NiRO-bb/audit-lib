@@ -1,10 +1,12 @@
 package com.example.audit_lib_spring_boot_starter.utils;
 
 import com.example.audit_lib_spring_boot_starter.annotations.AuditLog;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.Level;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -87,18 +89,30 @@ public final class LoggingUtil {
     }
 
     /**
-     * Converts Object array to string.
+     * Converts Object instance to json string.
      *
-     * @param array array must be converted to String type
-     * @return resulting string - [...]
+     * @param object instance must be converted
+     * @return json string
+     * @throws IOException
      */
-    public static String convertToString(Object[] array) {
+    public static String convertToString(Object object) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writeValueAsString(object);
+    }
+
+    /**
+     * Converts Object array to json string.
+     *
+     * @param array array must be converted
+     * @return
+     */
+    public static String convertToString(Object[] array) throws IOException {
         StringBuilder builder = new StringBuilder("[");
-        for (Object o : array) {
-            builder.append(o.toString()).append(", ");
+        for (Object obj : array) {
+            builder.append(convertToString(obj)).append(", ");
         }
         if (builder.lastIndexOf(",") > 0) {
-            builder.delete(builder.lastIndexOf(","), builder.length() - 1);
+            builder.delete(builder.lastIndexOf(","), builder.length());
         }
         builder.append("]");
         return builder.toString();

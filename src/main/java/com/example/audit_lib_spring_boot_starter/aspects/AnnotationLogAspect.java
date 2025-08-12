@@ -43,8 +43,9 @@ public class AnnotationLogAspect {
         kafkaLogger.log("START", id, methodName, args);
         try {
             Object result = joinPoint.proceed();
-            logger.log(level, "END {} {} result = {}", id, methodName, result);
-            kafkaLogger.log("END", id, methodName, result);
+            String jsonResult = LoggingUtil.convertToString(result);
+            logger.log(level, "END {} {} result = {}", id, methodName, jsonResult);
+            kafkaLogger.log("END", id, methodName, jsonResult);
             return result;
         } catch (Throwable t) {
             logger.log(level, "ERROR {} {} {}", id, methodName, t.getMessage());

@@ -2,9 +2,9 @@ package com.example.audit_lib_spring_boot_starter.interceptors;
 
 import com.example.audit_lib_spring_boot_starter.configs.AuditLibProperties;
 import com.example.audit_lib_spring_boot_starter.interceptors.wrappers.OutgoingResponseWrapper;
-import com.example.audit_lib_spring_boot_starter.kafka.KafkaLogger;
 import com.example.audit_lib_spring_boot_starter.utils.LogLevels;
 import com.example.audit_lib_spring_boot_starter.utils.LoggingUtil;
+import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +22,10 @@ import java.io.IOException;
 @Component
 public class OutgoingRequestInterceptor implements ClientHttpRequestInterceptor {
 
-    private final Logger logger = LogManager.getLogger("HttpLogger");
+    @Setter
+    private Logger logger = LogManager.getLogger("HttpLogger");
 
     private final LogLevels httpLoggingLevel;
-
-    @Autowired
-    private KafkaLogger kafkaLogger;
 
     public OutgoingRequestInterceptor(@Autowired AuditLibProperties properties) {
         httpLoggingLevel = properties.getHttpLoggingLevel();
@@ -45,9 +43,8 @@ public class OutgoingRequestInterceptor implements ClientHttpRequestInterceptor 
         String requestBody = LoggingUtil.getBody(body);
         String responseBody = LoggingUtil.getBody(responseWrapper.getBody().readAllBytes());
 
-        logger.log(LoggingUtil.getLevel(httpLoggingLevel), "Outgoing {} {} {} RequestBody = {} ResponseBody = {}",
-                method, statusCode, url, requestBody, responseBody);
-        kafkaLogger.log("Outgoing", method, statusCode, url, requestBody, responseBody);
+        logger.log(LoggingUtil.getLevel(httpLoggingLevel), "{} {} {} {} RequestBody = {} ResponseBody = {}",
+                "Outgoing", method, statusCode, url, requestBody, responseBody);
         return responseWrapper;
     }
 

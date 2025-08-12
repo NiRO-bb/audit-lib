@@ -1,6 +1,5 @@
 package com.example.audit_lib_spring_boot_starter.aspects;
 
-import com.example.audit_lib_spring_boot_starter.kafka.KafkaLogger;
 import com.example.audit_lib_spring_boot_starter.utils.LoggingUtil;
 import com.example.audit_lib_spring_boot_starter.utils.LogLevels;
 import org.apache.logging.log4j.Level;
@@ -9,7 +8,6 @@ import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -21,9 +19,6 @@ import org.springframework.stereotype.Component;
 public class AnnotationLogAspect {
 
      private final Logger logger = LogManager.getLogger("AnnotationLogger");
-
-     @Autowired
-     private KafkaLogger kafkaLogger;
 
     /**
      * Around advice.
@@ -39,17 +34,14 @@ public class AnnotationLogAspect {
         String methodName = LoggingUtil.getMethodName(joinPoint);
         String args = LoggingUtil.convertToString(joinPoint.getArgs());
 
-        logger.log(level, "START {} {} args = {}", id, methodName, args);
-        kafkaLogger.log("START", id, methodName, args);
+        logger.log(level, "{} {} {} args = {}", "START", id, methodName, args);
         try {
             Object result = joinPoint.proceed();
             String jsonResult = LoggingUtil.convertToString(result);
-            logger.log(level, "END {} {} result = {}", id, methodName, jsonResult);
-            kafkaLogger.log("END", id, methodName, jsonResult);
+            logger.log(level, "{} {} {} result = {}", "END", id, methodName, jsonResult);
             return result;
         } catch (Throwable t) {
-            logger.log(level, "ERROR {} {} {}", id, methodName, t.getMessage());
-            kafkaLogger.log("ERROR", id, methodName, t.getMessage());
+            logger.log(level, "{} {} {} {}", "ERROR", id, methodName, t.getMessage());
             throw t;
         }
     }

@@ -1,10 +1,10 @@
 package com.example.audit_lib_spring_boot_starter.kafka.dto;
 
-import com.example.audit_lib_spring_boot_starter.utils.LogLevels;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.logging.log4j.Level;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -22,7 +22,7 @@ public class KafkaAnnotationLog {
 
     private String date;
 
-    private LogLevels logLevel;
+    private String logLevel;
 
     private String stage;
 
@@ -32,7 +32,7 @@ public class KafkaAnnotationLog {
 
     private String body;
 
-    public KafkaAnnotationLog(LogLevels logLevel, String stage, String id, String methodName, String body) {
+    public KafkaAnnotationLog(String logLevel, String stage, String id, String methodName, String body) {
         date = LocalDateTime.now().format(formatter);
         this.logLevel = logLevel;
         this.stage = stage;

@@ -1,54 +1,100 @@
 package com.example.audit_lib_spring_boot_starter.kafka;
 
-import com.example.audit_lib_spring_boot_starter.configs.AuditLibProperties;
 import com.example.audit_lib_spring_boot_starter.kafka.dto.KafkaAnnotationLog;
 import com.example.audit_lib_spring_boot_starter.kafka.dto.KafkaHttpLog;
-import com.example.audit_lib_spring_boot_starter.utils.LogLevels;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.Core;
+import org.apache.logging.log4j.core.Filter;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.plugins.Plugin;
+import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
+import org.apache.logging.log4j.core.config.plugins.PluginElement;
+import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.stereotype.Component;
-
-import static com.example.audit_lib_spring_boot_starter.utils.LogLevels.OFF;
 
 /**
  * Manages log writing to Kafka topic.
  */
-@Component
-public class KafkaLogger {
+@Plugin(
+        name = "KafkaLogger",
+        category = Core.CATEGORY_NAME,
+        elementType = Appender.ELEMENT_TYPE)
+public class KafkaLogger extends AbstractAppender {
 
-    private final LogLevels annotationLogLevel;
+    private static String topic;
 
-    private final LogLevels httpLogLevel;
+    private static KafkaTemplate<String, Object> kafkaTemplate;
 
-    private final String topic;
+    protected KafkaLogger(String name, Filter filter) {
+        super(name, filter, null, false, null);
+    }
 
-    @Autowired
-    private KafkaTemplate<String, Object> kafkaTemplate;
-
-    public KafkaLogger(@Autowired AuditLibProperties properties) {
-        annotationLogLevel = properties.getAnnotationKafkaLevel();
-        httpLogLevel = properties.getHttpKafkaLevel();
-        topic = properties.getKafkaTopicName();
+    @PluginFactory
+    public static KafkaLogger createAppender(
+            @PluginAttribute("name") String name,
+            @PluginElement("Filter") Filter filter) {
+        return new KafkaLogger(name, filter);
     }
 
     /**
-     * Sends message to Kafka topic from annotated methods.
+     * Sets KafkaTemplate for sending messages and topic where messages will be sent.
+     *
+     * @param kafkaTemplate
+     * @param topic
      */
-    public void log(String stage, String id, String methodName, String body) {
-        if (!annotationLogLevel.equals(OFF)) {
-            kafkaTemplate.send(topic,
-                    new KafkaAnnotationLog(annotationLogLevel, stage, id, methodName, body));
-        }
+    public static void setKafkaTemplate(KafkaTemplate<String, Object> kafkaTemplate, String topic) {
+        KafkaLogger.kafkaTemplate = kafkaTemplate;
+        KafkaLogger.topic = topic;
+    }
+
+    @Override
+    public void append(LogEvent event) {
+        Object log = getLog(event);
+        kafkaTemplate.send(topic, log);
     }
 
     /**
-     * Sends message to Kafka topic from http-requests.
+     * Returns Annotation/Http log instance depends on logger name.
+     *
+     * @param event
+     * @return
      */
-    public void log(String type, String method, int statusCode, String url, String request, String response) {
-        if (!httpLogLevel.equals(OFF)) {
-            kafkaTemplate.send(topic,
-                    new KafkaHttpLog(type, method, statusCode, url, request, response));
-        }
+    private Object getLog(LogEvent event) {
+        return switch (event.getLoggerName()) {
+            case "HttpLogger" -> httpLog(event);
+            case "AnnotationLogger" -> annotationLog(event);
+            default -> null;
+        };
+    }
+
+    /**
+     * Assembles message for Kafka from passed LogEvent.
+     */
+    private KafkaAnnotationLog annotationLog(LogEvent event) {
+        Object[] params = event.getMessage().getParameters();
+        return new KafkaAnnotationLog(
+                event.getLevel().toString(),
+                (String) params[0],
+                (String) params[1],
+                (String) params[2],
+                (String) params[3]
+        );
+    }
+
+    /**
+     * Assembles message for Kafka from passed LogEvent.
+     */
+    private KafkaHttpLog httpLog(LogEvent event) {
+        Object[] params = event.getMessage().getParameters();
+        return new KafkaHttpLog(
+                (String) params[0],
+                (String) params[1],
+                (Integer) params[2],
+                (String) params[3],
+                (String) params[4],
+                (String) params[5]
+        );
     }
 
 }

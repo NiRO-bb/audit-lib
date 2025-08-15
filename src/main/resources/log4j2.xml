@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration xmlns:xi="http://www.w3.org/2001/XInclude"
+               packages="com.example.audit_lib_spring_boot_starter.kafka">
+    <Appenders>
+        <Console name="RootAppender">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+        </Console>
+
+        <Console name="AnnotationConsoleAppender">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %msg%n"/>
+        </Console>
+
+        <RollingFile name="AnnotationFileAppender" filePattern="logs/$${date:yyyy-MM}/%d{yyyy-MM-dd}-AuditLog%i.log">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level - %msg%n"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="1 MB"/>
+            </Policies>
+        </RollingFile>
+
+        <Console name="HttpConsoleAppender">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %msg%n"/>
+        </Console>
+
+        <RollingFile name="HttpFileAppender" filePattern="logs/$${date:yyyy-MM}/%d{yyyy-MM-dd}-Http%i.log">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level - %msg%n"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="1 MB"/>
+            </Policies>
+        </RollingFile>
+
+        <KafkaLogger name="KafkaLogger"/>
+    </Appenders>
+
+    <Loggers>
+        <Root level="ALL">
+            <AppenderRef ref="RootAppender" level="INFO"/>
+        </Root>
+
+        <Logger name="AnnotationLogger" level="ALL" additivity="false">
+            <AppenderRef ref="AnnotationConsoleAppender" level="${AnnotationConsoleLevel}"/>
+            <AppenderRef ref="AnnotationFileAppender" level="${AnnotationFileLevel}"/>
+            <AppenderRef ref="KafkaLogger" level="${AnnotationKafkaLevel}"/>
+        </Logger>
+
+        <Logger name="HttpLogger" level="ALL" additivity="false">
+            <AppenderRef ref="HttpConsoleAppender" level="${HttpConsoleLevel}"/>
+            <AppenderRef ref="HttpFileAppender" level="${HttpFileLevel}"/>
+            <AppenderRef ref="KafkaLogger" level="${HttpKafkaLevel}"/>
+        </Logger>
+    </Loggers>
+
+    <Properties>
+        <Property name="AnnotationConsoleLevel" value="${bundle:application:audit-lib.annotationConsoleLevel:-OFF}"/>
+        <Property name="AnnotationFileLevel" value="${bundle:application:audit-lib.annotationFileLevel:-OFF}"/>
+
+        <Property name="HttpConsoleLevel" value="${bundle:application:audit-lib.httpConsoleLevel:-OFF}"/>
+        <Property name="HttpFileLevel" value="${bundle:application:audit-lib.httpFileLevel:-OFF}"/>
+
+        <Property name="AnnotationKafkaLevel" value="${bundle:application:audit-lib.annotationKafkaLevel:-OFF}"/>
+        <Property name="HttpKafkaLevel" value="${bundle:application:audit-lib.httpKafkaLevel:-OFF}"/>
+    </Properties>
+</Configuration>

@@ -28,7 +28,7 @@ public class OutgoingRequestInterceptor implements ClientHttpRequestInterceptor 
     private final LogLevels httpLoggingLevel;
 
     public OutgoingRequestInterceptor(@Autowired AuditLibProperties properties) {
-        httpLoggingLevel = properties.getHttpLoggingLevel();
+        httpLoggingLevel = properties.getRequestLoggingLevel();
     }
 
     @Override

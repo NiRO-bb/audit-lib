@@ -1,6 +1,6 @@
 package com.example.audit_lib_spring_boot_starter.utils;
 
-import com.example.audit_lib_spring_boot_starter.kafka.dto.KafkaAnnotationLog;
+import com.example.audit_lib_spring_boot_starter.kafka.dto.KafkaMethodLog;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -12,11 +12,11 @@ public class KafkaConsumer {
 
     private CountDownLatch latch = new CountDownLatch(1);
 
-    private KafkaAnnotationLog log;
+    private KafkaMethodLog log;
 
     @KafkaListener(topics = "test_topic")
     public void listener(ConsumerRecord<String, Object> record) {
-        log = (KafkaAnnotationLog) record.value();
+        log = (KafkaMethodLog) record.value();
         latch.countDown();
     }
 
@@ -28,7 +28,7 @@ public class KafkaConsumer {
         return latch;
     }
 
-    public KafkaAnnotationLog getLog() {
+    public KafkaMethodLog getLog() {
         return log;
     }
 

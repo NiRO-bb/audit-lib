@@ -45,11 +45,15 @@ public class AuditLibConfiguration {
     }
 
     /**
-     * todo add description
+     * Sets some values for KafkaLogger - kafkaTemplate instance and used topic names.
      */
     @PostConstruct
     public void postConstruct() {
-        KafkaLogger.setKafkaTemplate(kafkaTemplate, properties.getKafkaTopicName());
+        KafkaLogger.setKafkaTemplate(kafkaTemplate);
+        KafkaLogger.setKafkaTopics(
+                properties.getKafkaMethodsTopic(),
+                properties.getKafkaRequestsTopic()
+        );
     }
 
 }

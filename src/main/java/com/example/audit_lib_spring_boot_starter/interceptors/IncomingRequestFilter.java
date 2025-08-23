@@ -32,7 +32,7 @@ public class IncomingRequestFilter implements Filter {
     private final LogLevels httpLoggingLevel;
 
     public IncomingRequestFilter(@Autowired AuditLibProperties properties) {
-        httpLoggingLevel = properties.getHttpLoggingLevel();
+        httpLoggingLevel = properties.getRequestLoggingLevel();
     }
 
     @Override

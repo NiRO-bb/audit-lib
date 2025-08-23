@@ -1,7 +1,7 @@
 package com.example.audit_lib_spring_boot_starter;
 
 import com.example.audit_lib_spring_boot_starter.configs.TestConfig;
-import com.example.audit_lib_spring_boot_starter.kafka.dto.KafkaAnnotationLog;
+import com.example.audit_lib_spring_boot_starter.kafka.dto.KafkaMethodLog;
 import com.example.audit_lib_spring_boot_starter.utils.KafkaConsumer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ public class KafkaTest {
 
     @Test
     public void testSendAnnotationSuccess() throws InterruptedException {
-        KafkaAnnotationLog log = new KafkaAnnotationLog(
+        KafkaMethodLog log = new KafkaMethodLog(
                 "WARN",
                 "START",
                 UUID.randomUUID().toString(),

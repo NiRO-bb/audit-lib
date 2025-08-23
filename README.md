@@ -39,7 +39,8 @@ maven clean install
 * audit-lib.httpLoggingLevel (default - INFO) - defines actual logging level of logs written anywhere due to http-requests
 * audit-lib.annotationKafkaLevel (default - OFF) - defines actual logging level of logs written to Kafka topic due to annotation (default - no log can be written)
 * audit-lib.httpKafkaLevel (default - OFF) - defines actual logging level of logs written to Kafka topic due to http-requests (default - no log can be written)
-* audit-lib.kafkaTopicName (default - AuditLib) - sets Kafka topic name where messages will be sent
+* audit-lib.kafkaMethodTopic (default - audit.methods) - sets Kafka topic name where method logs will be sent
+* audit-lib.kafkaRequestTopic (default - audit.requests) - sets Kafka topic name where request logs will be sent
 * audit-lib.kafkaPartitionNum (default - 1) - sets Kafka topic partition number
 * audit-lib.kafkaReplicationFactor (default - 1) - sets Kafka partition replication factor
 
@@ -58,7 +59,7 @@ You must write .env_dev file with following values (you can use .env_template fi
 * KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
 * KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
 
-<b>!</b> docker-compose.yml uses docker network - 'prodcuer-consumer'. 
+<b>!</b> docker-compose.yml uses docker network - 'producer-consumer'. 
 This for interaction with other containers (Kafka consumer, for example). But you must create this network manually:
 ```shell
 docker network create producer-consumer

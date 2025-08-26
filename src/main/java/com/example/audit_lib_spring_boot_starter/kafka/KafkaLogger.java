@@ -1,7 +1,7 @@
 package com.example.audit_lib_spring_boot_starter.kafka;
 
-import com.example.audit_lib_spring_boot_starter.kafka.dto.KafkaAnnotationLog;
-import com.example.audit_lib_spring_boot_starter.kafka.dto.KafkaHttpLog;
+import com.example.audit_lib_spring_boot_starter.kafka.dto.KafkaMethodLog;
+import com.example.audit_lib_spring_boot_starter.kafka.dto.KafkaRequestLog;
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Core;
 import org.apache.logging.log4j.core.Filter;
@@ -22,9 +22,15 @@ import org.springframework.kafka.core.KafkaTemplate;
         elementType = Appender.ELEMENT_TYPE)
 public class KafkaLogger extends AbstractAppender {
 
-    private static String topic;
+    private static String methodTopic;
+
+    private static String requestTopic;
 
     private static KafkaTemplate<String, Object> kafkaTemplate;
+
+    private final String methodLogger = "AnnotationLogger";
+
+    private final String requestLogger = "HttpLogger";
 
     protected KafkaLogger(String name, Filter filter) {
         super(name, filter, null, false, null);
@@ -38,32 +44,57 @@ public class KafkaLogger extends AbstractAppender {
     }
 
     /**
-     * Sets KafkaTemplate for sending messages and topic where messages will be sent.
+     * Sets KafkaTemplate for sending messages.
      *
      * @param kafkaTemplate
-     * @param topic
      */
-    public static void setKafkaTemplate(KafkaTemplate<String, Object> kafkaTemplate, String topic) {
+    public static void setKafkaTemplate(KafkaTemplate<String, Object> kafkaTemplate) {
         KafkaLogger.kafkaTemplate = kafkaTemplate;
-        KafkaLogger.topic = topic;
+    }
+
+    /**
+     * Sets names of used topics.
+     *
+     * @param methodTopic
+     * @param requestTopic
+     */
+    public static void setKafkaTopics(String methodTopic, String requestTopic) {
+        KafkaLogger.methodTopic = methodTopic;
+        KafkaLogger.requestTopic = requestTopic;
     }
 
     @Override
     public void append(LogEvent event) {
-        Object log = getLog(event);
-        kafkaTemplate.send(topic, log);
+        String topic = getTopic(event.getLoggerName());
+        if (topic != null) {
+            kafkaTemplate.send(topic, getLog(event));
+        }
+    }
+
+    /**
+     * Maps name of called logger with name of Kafka topic where message will be sent.
+     *
+     * @param logger
+     * @return name of Kafka topic
+     */
+    private String getTopic(String logger) {
+        return switch(logger) {
+            case methodLogger -> methodTopic;
+            case requestLogger -> requestTopic;
+            default -> null;
+        };
     }
 
     /**
      * Returns Annotation/Http log instance depends on logger name.
      *
      * @param event
-     * @return
+     * @return KafkaRequestLog or KafkaMethodLog instance depends on name of used logger.
      */
     private Object getLog(LogEvent event) {
         return switch (event.getLoggerName()) {
-            case "HttpLogger" -> httpLog(event);
-            case "AnnotationLogger" -> annotationLog(event);
+            case requestLogger -> httpLog(event);
+            case methodLogger -> annotationLog(event);
             default -> null;
         };
     }
@@ -71,9 +102,9 @@ public class KafkaLogger extends AbstractAppender {
     /**
      * Assembles message for Kafka from passed LogEvent.
      */
-    private KafkaAnnotationLog annotationLog(LogEvent event) {
+    private KafkaMethodLog annotationLog(LogEvent event) {
         Object[] params = event.getMessage().getParameters();
-        return new KafkaAnnotationLog(
+        return new KafkaMethodLog(
                 event.getLevel().toString(),
                 (String) params[0],
                 (String) params[1],
@@ -85,9 +116,9 @@ public class KafkaLogger extends AbstractAppender {
     /**
      * Assembles message for Kafka from passed LogEvent.
      */
-    private KafkaHttpLog httpLog(LogEvent event) {
+    private KafkaRequestLog httpLog(LogEvent event) {
         Object[] params = event.getMessage().getParameters();
-        return new KafkaHttpLog(
+        return new KafkaRequestLog(
                 (String) params[0],
                 (String) params[1],
                 (Integer) params[2],

@@ -50,13 +50,13 @@
     </Loggers>
 
     <Properties>
-        <Property name="AnnotationConsoleLevel" value="${bundle:application:audit-lib.annotationConsoleLevel:-OFF}"/>
-        <Property name="AnnotationFileLevel" value="${bundle:application:audit-lib.annotationFileLevel:-OFF}"/>
+        <Property name="AnnotationConsoleLevel" value="${bundle:application:audit-lib.methodConsoleLevel:-OFF}"/>
+        <Property name="AnnotationFileLevel" value="${bundle:application:audit-lib.methodFileLevel:-OFF}"/>
 
-        <Property name="HttpConsoleLevel" value="${bundle:application:audit-lib.httpConsoleLevel:-OFF}"/>
-        <Property name="HttpFileLevel" value="${bundle:application:audit-lib.httpFileLevel:-OFF}"/>
+        <Property name="HttpConsoleLevel" value="${bundle:application:audit-lib.requestConsoleLevel:-OFF}"/>
+        <Property name="HttpFileLevel" value="${bundle:application:audit-lib.requestFileLevel:-OFF}"/>
 
-        <Property name="AnnotationKafkaLevel" value="${bundle:application:audit-lib.annotationKafkaLevel:-OFF}"/>
-        <Property name="HttpKafkaLevel" value="${bundle:application:audit-lib.httpKafkaLevel:-OFF}"/>
+        <Property name="AnnotationKafkaLevel" value="${bundle:application:audit-lib.methodKafkaLevel:-OFF}"/>
+        <Property name="HttpKafkaLevel" value="${bundle:application:audit-lib.requestKafkaLevel:-OFF}"/>
     </Properties>
 </Configuration>

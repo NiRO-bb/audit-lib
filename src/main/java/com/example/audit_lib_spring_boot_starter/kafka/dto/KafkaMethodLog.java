@@ -14,33 +14,30 @@ import java.time.format.DateTimeFormatter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class KafkaHttpLog {
+public class KafkaMethodLog {
 
     @JsonIgnore
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
     private String date;
 
-    private String type;
+    private String logLevel;
 
-    private String method;
+    private String stage;
 
-    private int statusCode;
+    private String id;
 
-    private String url;
+    private String methodName;
 
-    private String request;
+    private String body;
 
-    private String response;
-
-    public KafkaHttpLog(String type, String method, int statusCode, String url, String request, String response) {
+    public KafkaMethodLog(String logLevel, String stage, String id, String methodName, String body) {
         date = LocalDateTime.now().format(formatter);
-        this.type = type;
-        this.method = method;
-        this.statusCode = statusCode;
-        this.url = url;
-        this.request = request;
-        this.response = response;
+        this.logLevel = logLevel;
+        this.stage = stage;
+        this.id = id;
+        this.methodName = methodName;
+        this.body = body;
     }
 
 }

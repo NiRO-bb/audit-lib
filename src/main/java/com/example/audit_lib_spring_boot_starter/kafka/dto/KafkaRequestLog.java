@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.logging.log4j.Level;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -15,30 +14,33 @@ import java.time.format.DateTimeFormatter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class KafkaAnnotationLog {
+public class KafkaRequestLog {
 
     @JsonIgnore
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
     private String date;
 
-    private String logLevel;
+    private String type;
 
-    private String stage;
+    private String method;
 
-    private String id;
+    private int statusCode;
 
-    private String methodName;
+    private String url;
 
-    private String body;
+    private String request;
 
-    public KafkaAnnotationLog(String logLevel, String stage, String id, String methodName, String body) {
+    private String response;
+
+    public KafkaRequestLog(String type, String method, int statusCode, String url, String request, String response) {
         date = LocalDateTime.now().format(formatter);
-        this.logLevel = logLevel;
-        this.stage = stage;
-        this.id = id;
-        this.methodName = methodName;
-        this.body = body;
+        this.type = type;
+        this.method = method;
+        this.statusCode = statusCode;
+        this.url = url;
+        this.request = request;
+        this.response = response;
     }
 
 }

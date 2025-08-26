@@ -46,13 +46,25 @@ public class KafkaConfig {
     }
 
     /**
-     * Provides new Kafka topic.
+     * Creates new Kafka topic for annotated method logs.
      *
-     * @return
+     * @return created Kafka topic
      */
     @Bean
-    public NewTopic topic() {
-        return new NewTopic(properties.getKafkaTopicName(),
+    public NewTopic methodTopic() {
+        return new NewTopic(properties.getKafkaMethodsTopic(),
+                properties.getKafkaPartitionNum(),
+                properties.getKafkaReplicationFactor());
+    }
+
+    /**
+     * Creates new Kafka topic for http-request logs.
+     *
+     * @return created Kafka topic
+     */
+    @Bean
+    public NewTopic requestTopic() {
+        return new NewTopic(properties.getKafkaRequestsTopic(),
                 properties.getKafkaPartitionNum(),
                 properties.getKafkaReplicationFactor());
     }
@@ -63,7 +75,7 @@ public class KafkaConfig {
      * Sets some settings:
      * StringSerializer for key, JsonSerializer for value, enable idempotence.
      * Uses JsonSerializer type mapping:
-     * 'http' for KafkaHttpLog class, 'annotation' for KafkaAnnotationLog class.
+     * 'http' for KafkaRequestLog class, 'annotation' for KafkaMethodLog class.
      *
      * @return
      */
@@ -75,8 +87,8 @@ public class KafkaConfig {
         configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         configs.put(JsonSerializer.TYPE_MAPPINGS,
-                "http:com.example.audit_lib_spring_boot_starter.kafka.dto.KafkaHttpLog, " +
-                        "annotation:com.example.audit_lib_spring_boot_starter.kafka.dto.KafkaAnnotationLog");
+                "http:com.example.audit_lib_spring_boot_starter.kafka.dto.KafkaRequestLog, " +
+                        "annotation:com.example.audit_lib_spring_boot_starter.kafka.dto.KafkaMethodLog");
         configs.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
         configs.put(ProducerConfig.ACKS_CONFIG, "all");
         return new DefaultKafkaProducerFactory<>(configs);

@@ -26,8 +26,8 @@ public class TestConfig {
         configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         configs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         configs.put(JsonDeserializer.TYPE_MAPPINGS,
-                "http:com.example.audit_lib_spring_boot_starter.kafka.dto.KafkaHttpLog, " +
-                        "annotation:com.example.audit_lib_spring_boot_starter.kafka.dto.KafkaAnnotationLog");
+                "http:com.example.audit_lib_spring_boot_starter.kafka.dto.KafkaRequestLog, " +
+                        "annotation:com.example.audit_lib_spring_boot_starter.kafka.dto.KafkaMethodLog");
         configs.put(JsonDeserializer.TRUSTED_PACKAGES, "com.example.audit_listener.dto");
         return new DefaultKafkaConsumerFactory<>(configs);
     }

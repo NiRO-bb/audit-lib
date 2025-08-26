@@ -15,9 +15,11 @@ public class AuditLibProperties {
     /**
      * Defines logging level of HttpLogger (used in IncomingRequestFilter and OutgoingRequestInterceptor).
      */
-    private LogLevels httpLoggingLevel = INFO;
+    private LogLevels requestLoggingLevel = INFO;
 
-    private String kafkaTopicName = "AuditLib";
+    private String kafkaMethodsTopic = "audit.methods";
+
+    private String kafkaRequestsTopic = "audit.requests";
 
     private int kafkaPartitionNum = 1;
 
